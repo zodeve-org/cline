@@ -3,7 +3,7 @@ or {
 		or {
 			// File system operations
 			$fn <: `vscode.workspace.fs.stat`,
-			$fn <: `vscode.workspace.fs.writeFile`,
+			// $fn <: `vscode.workspace.fs.writeFile`,
 			// Workspace operations
 			$fn <: `vscode.workspace.asRelativePath`,
 			$fn <: `vscode.workspace.getWorkspaceFolder`,
