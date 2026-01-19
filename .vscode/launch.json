@@ -11,6 +11,7 @@
 			"request": "launch",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--enable-proposed-api=saoudrizwan.claude-dev",
 				"--disable-workspace-trust",
 				"--disable-extension",
 				"saoudrizwan.claude-dev", // Avoid conflicts with installed Cline
