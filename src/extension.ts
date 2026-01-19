@@ -46,6 +46,7 @@ import { LogoutReason } from "./services/auth/types"
 import { telemetryService } from "./services/telemetry"
 import { SharedUriHandler } from "./services/uri/SharedUriHandler"
 import { ShowMessageType } from "./shared/proto/host/window"
+import { updateContextStores } from "./store"
 import { fileExistsAtPath } from "./utils/fs"
 /*
 Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -58,7 +59,8 @@ https://github.com/microsoft/vscode-webview-ui-toolkit-samples/tree/main/framewo
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(ctx: vscode.ExtensionContext) {
+	const context = await updateContextStores(ctx)
 	setupHostProvider(context)
 
 	// Initialize hook discovery cache for performance optimization
