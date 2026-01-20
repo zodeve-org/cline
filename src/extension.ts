@@ -49,6 +49,7 @@ import { ClineTempManager } from "./services/temp"
 import { SharedUriHandler } from "./services/uri/SharedUriHandler"
 import { ShowMessageType } from "./shared/proto/host/window"
 import { updateContextStores } from "./store"
+import { createTreeView } from "./treeView"
 import { fileExistsAtPath } from "./utils/fs"
 /*
 Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -545,6 +546,8 @@ ${ctx.cellJson || "{}"}
 		}),
 	)
 
+	createTreeView(commands.FocusChatInput)
+	HostProvider.workspace.openClineSidebarPanel({})
 	return createClineAPI(webview.controller)
 }
 
