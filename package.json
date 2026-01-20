@@ -45,6 +45,9 @@
 		"workspaceContains:evals.env"
 	],
 	"main": "./dist/extension.js",
+	"enabledApiProposals": [
+		"extensionRuntime"
+	],
 	"contributes": {
 		"icons": {
 			"cline-icon": {
