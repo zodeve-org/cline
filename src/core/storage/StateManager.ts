@@ -4,7 +4,6 @@ import {
 	GlobalState,
 	GlobalStateAndSettings,
 	GlobalStateAndSettingsKey,
-	GlobalStateKey,
 	isSecretKey,
 	isSettingsKey,
 	LocalState,
@@ -19,6 +18,7 @@ import {
 import chokidar, { FSWatcher } from "chokidar"
 import type { ExtensionContext } from "vscode"
 import { HostProvider } from "@/hosts/host-provider"
+import { Logger } from "@/services/logging/Logger"
 import { ShowMessageType } from "@/shared/proto/index.host"
 import {
 	getTaskHistoryStateFilePath,
@@ -106,9 +106,9 @@ export class StateManager {
 
 		try {
 			// Load all extension state from disk
-			const globalState = await readGlobalStateFromDisk(StateManager.instance.context)
-			const secrets = await readSecretsFromDisk(StateManager.instance.context)
-			const workspaceState = await readWorkspaceStateFromDisk(StateManager.instance.context)
+			const globalState = await readGlobalStateFromDisk(context)
+			const secrets = await readSecretsFromDisk(context)
+			const workspaceState = await readWorkspaceStateFromDisk(context)
 
 			// Populate the cache with all extension state and secrets fields
 			// Use populate method to avoid triggering persistence during initialization
@@ -178,7 +178,7 @@ export class StateManager {
 
 		// Then track the keys for persistence
 		Object.keys(updates).forEach((key) => {
-			this.pendingGlobalState.add(key as GlobalStateKey)
+			this.pendingGlobalState.add(key as GlobalStateAndSettingsKey)
 		})
 
 		// Schedule debounced persistence
@@ -310,6 +310,12 @@ export class StateManager {
 
 		// Update cache immediately for all keys
 		Object.entries(updates).forEach(([key, value]) => {
+			// Skip unchanged values as we don't want to trigger unnecessary
+			// writes & incorrectly fire an onDidChange events.
+			const current = this.secretsCache[key as keyof Secrets]
+			if (current === value) {
+				return
+			}
 			this.secretsCache[key as keyof Secrets] = value
 			this.pendingSecrets.add(key as SecretKey)
 		})
@@ -691,7 +697,7 @@ export class StateManager {
 				await this.persistPendingState()
 				this.persistenceTimeout = null
 			} catch (error) {
-				console.error("[StateManager] Failed to persist pending changes:", error)
+				Logger.error("[StateManager] Failed to persist pending changes:", error)
 				this.persistenceTimeout = null
 
 				// Call persistence error callback for error recovery
